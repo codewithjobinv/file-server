@@ -253,4 +253,6 @@ MIT License – feel free to use and extend.
 **Jobin Varghese (codewithjobinv)**  
 A Java Developer exploring Spring Boot, security best practices, and backend engineering.
 
+**Connect with me on LinkedIn:** [Jobin Varghese](www.linkedin.com/in/jobin-varghese-thonnurinchira)
+
 ---
