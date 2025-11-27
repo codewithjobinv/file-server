@@ -1,4 +1,4 @@
-package com.example.file_server;
+package com.example.fileserver;
 
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;

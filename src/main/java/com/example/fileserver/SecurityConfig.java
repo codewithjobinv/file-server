@@ -1,4 +1,4 @@
-package com.example.file_server;
+package com.example.fileserver;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
