@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>File Upload Server</title>
+</head>
+<body>
+<h1>Secure File Upload</h1>
+
+<!-- Message from server-side -->
+<p th:if="${message}" th:text="${message}"></p>
+
+<form id="uploadForm" method="post" enctype="multipart/form-data" th:action="@{/upload}">
+    <label>Select file:</label>
+    <input type="file" name="file" id="fileInput" required>
+    <button type="submit">Upload</button>
+</form>
+
+<!-- Progress UI -->
+<div id="progressContainer" style="margin-top: 10px; display: none;">
+    <progress id="progressBar" value="0" max="100" style="width: 300px;"></progress>
+    <span id="progressText">0%</span>
+</div>
+
+<div id="statusMessage" style="margin-top: 10px; color: green;"></div>
+<div id="errorMessage" style="margin-top: 10px; color: red;"></div>
+
+<h2>Available Files</h2>
+<ul>
+    <li th:each="fileName : ${files}">
+        <a th:href="@{|/download/${fileName}|}" th:text="${fileName}"></a>
+    </li>
+</ul>
+
+<script>
+    const form = document.getElementById('uploadForm');
+    const fileInput = document.getElementById('fileInput');
+    const progressContainer = document.getElementById('progressContainer');
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    const statusMessage = document.getElementById('statusMessage');
+    const errorMessage = document.getElementById('errorMessage');
+
+    form.addEventListener('submit', function (event) {
+        event.preventDefault(); // stop normal form submit
+
+        statusMessage.textContent = '';
+        errorMessage.textContent = '';
+
+        if (!fileInput.files || fileInput.files.length === 0) {
+            errorMessage.textContent = 'Please select a file to upload.';
+            return;
+        }
+
+        const file = fileInput.files[0];
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', form.action); // /upload
+
+        // Show progress container
+        progressContainer.style.display = 'block';
+        progressBar.value = 0;
+        progressText.textContent = '0%';
+
+        // Track upload progress
+        xhr.upload.addEventListener('progress', function (e) {
+            if (e.lengthComputable) {
+                const percent = Math.round((e.loaded / e.total) * 100);
+                progressBar.value = percent;
+                progressText.textContent = percent + '%';
+            }
+        });
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    statusMessage.textContent = 'Upload complete.';
+                    errorMessage.textContent = '';
+
+                    // Optional: reload the page so the file list updates
+                    setTimeout(function () {
+                        window.location.reload();
+                    }, 800);
+                } else {
+                    errorMessage.textContent = 'Upload failed: ' + xhr.status + ' ' + xhr.statusText;
+                    statusMessage.textContent = '';
+                }
+            }
+        };
+
+        xhr.onerror = function () {
+            errorMessage.textContent = 'An error occurred during upload.';
+            statusMessage.textContent = '';
+        };
+
+        xhr.send(formData);
+    });
+</script>
+
+</body>
+</html>
